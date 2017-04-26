@@ -57,16 +57,27 @@ public class MainActivity extends AppCompatActivity {
         Button buttonMinus = (Button) findViewById(R.id.buttonMinus);
 
         //Another listener for the clear button
-        View.OnClickListener clearListener = new View.OnClickListener() {
+//        View.OnClickListener clearListener = new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                newNumberEditText.getText().clear();
+//                resultEditText.getText().clear();
+//                operatorDisplayTextView.setText("");
+//            }
+//        };
+
+        //Another way of declaring on click listener
+
+        buttonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newNumberEditText.getText().clear();
                 resultEditText.getText().clear();
                 operatorDisplayTextView.setText("");
             }
-        };
+        });
 
-        buttonClear.setOnClickListener(clearListener);
+//        buttonClear.setOnClickListener(clearListener);
         //We will have a separate onClick listener for numbers and decimal
         //It will update the lower textView or newNumberTextView to show whatever was clicked by the user
 
@@ -118,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 try {
-                    if ( !resultEditText.getText().toString().isEmpty() && !newNumberEditText.getText().toString().isEmpty()
+                    if (!resultEditText.getText().toString().isEmpty() && !newNumberEditText.getText().toString().isEmpty()
                             && !operatorDisplayTextView.getText().toString().isEmpty()) {
                         operand1 = Double.parseDouble(resultEditText.getText().toString());
                         operand2 = Double.parseDouble(newNumberEditText.getText().toString());
@@ -126,13 +137,13 @@ public class MainActivity extends AppCompatActivity {
                         String result = performOperation(operand1, operand2, operator);
                         resultEditText.setText(result);
                         newNumberEditText.getText().clear();
-                    }else {
+                    } else {
 //                    Toast.makeText(MainActivity.this, "Need two operands to perform operation", Toast.LENGTH_SHORT).show();
-                    resultEditText.append(operatorDisplayTextView.getText().toString());
+                        resultEditText.append(operatorDisplayTextView.getText().toString());
                         resultEditText.append(newNumberEditText.getText().toString());
                         newNumberEditText.getText().clear();
                     }
-                }catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(MainActivity.this, "Invalid input, please try again", Toast.LENGTH_SHORT).show(); //To deal if the user is
                     //entering just the decimal point and adding a number to it
                     //Can also clear both the editText to display nothing when this happens
@@ -150,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
         operatorDisplayTextView.setText(operator);
     }
 
-    private String performOperation(Double value1, Double value2, String op){
+    private String performOperation(Double value1, Double value2, String op) {
         Double result;
         String output;
-        switch (op){
+        switch (op) {
             case "+":
                 result = value1 + value2;
                 output = result.toString();
@@ -165,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
             case "/":
                 //Need to add the test for zero
-                if (value1 == 0.0){
+                if (value1 == 0.0) {
                     return "0.00"; //In such case return from here no need to go ahead with the code
                 }
                 result = value1 / value2;
