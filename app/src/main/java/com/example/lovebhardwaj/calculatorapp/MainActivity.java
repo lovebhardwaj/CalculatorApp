@@ -6,8 +6,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    //Since we are using editText android saves the data when we change orientation
+    //But the operation being the TextView looses its value
+    private static final String OPERATOR_VALUE = "Operator value"; //Will be used to save the data
     //Reference variable for the layout widgets
     private EditText resultEditText;
     private EditText newNumberEditText;
@@ -29,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
         newNumberEditText = (EditText) findViewById(R.id.newNumberEditText);
         operatorDisplayTextView = (TextView) findViewById(R.id.operationsTextView);
 
+        //Clear button to clear everything on the screen
+        Button buttonClear = (Button) findViewById(R.id.buttonClear);
+
+
         Button button0 = (Button) findViewById(R.id.button0);
         Button button1 = (Button) findViewById(R.id.button1);
         Button button2 = (Button) findViewById(R.id.button2);
@@ -48,6 +56,17 @@ public class MainActivity extends AppCompatActivity {
         Button buttonAdd = (Button) findViewById(R.id.buttonAddition);
         Button buttonMinus = (Button) findViewById(R.id.buttonMinus);
 
+        //Another listener for the clear button
+        View.OnClickListener clearListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newNumberEditText.getText().clear();
+                resultEditText.getText().clear();
+                operatorDisplayTextView.setText("");
+            }
+        };
+
+        buttonClear.setOnClickListener(clearListener);
         //We will have a separate onClick listener for numbers and decimal
         //It will update the lower textView or newNumberTextView to show whatever was clicked by the user
 
@@ -81,8 +100,10 @@ public class MainActivity extends AppCompatActivity {
                 Button b = (Button) v;
                 operator = b.getText().toString();
                 operatorDisplayTextView.setText(operator);
-                resultEditText.append(newNumberEditText.getText().toString());
-                newNumberEditText.getText().clear();
+                if (!newNumberEditText.getText().toString().isEmpty()) {
+                    resultEditText.setText(newNumberEditText.getText().toString());
+                    newNumberEditText.getText().clear();
+                }
             }
         };
 
@@ -95,22 +116,38 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener calculateListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ( !resultEditText.getText().toString().isEmpty() && !newNumberEditText.getText().toString().isEmpty()
-                        && !operatorDisplayTextView.getText().toString().isEmpty()) {
-                    operand1 = Double.parseDouble(resultEditText.getText().toString());
-                    operand2 = Double.parseDouble(newNumberEditText.getText().toString());
-                    operator = operatorDisplayTextView.getText().toString();
-                    String result = performOperation(operand1, operand2, operator);
-                    resultEditText.setText(result);
-                    newNumberEditText.getText().clear();
-                }else {
+
+                try {
+                    if ( !resultEditText.getText().toString().isEmpty() && !newNumberEditText.getText().toString().isEmpty()
+                            && !operatorDisplayTextView.getText().toString().isEmpty()) {
+                        operand1 = Double.parseDouble(resultEditText.getText().toString());
+                        operand2 = Double.parseDouble(newNumberEditText.getText().toString());
+                        operator = operatorDisplayTextView.getText().toString();
+                        String result = performOperation(operand1, operand2, operator);
+                        resultEditText.setText(result);
+                        newNumberEditText.getText().clear();
+                    }else {
 //                    Toast.makeText(MainActivity.this, "Need two operands to perform operation", Toast.LENGTH_SHORT).show();
-//                    resultEditText.append(operatorDisplayTextView.getText().toString());
-                    resultEditText.append(newNumberEditText.getText().toString());
+                    resultEditText.append(operatorDisplayTextView.getText().toString());
+                        resultEditText.append(newNumberEditText.getText().toString());
+                        newNumberEditText.getText().clear();
+                    }
+                }catch (NumberFormatException e){
+                    Toast.makeText(MainActivity.this, "Invalid input, please try again", Toast.LENGTH_SHORT).show(); //To deal if the user is
+                    //entering just the decimal point and adding a number to it
+                    //Can also clear both the editText to display nothing when this happens
                 }
             }
         };
         buttonEquals.setOnClickListener(calculateListener);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        //Restore the data when the activity is recreated after change in orientation
+        super.onRestoreInstanceState(savedInstanceState);
+        operator = savedInstanceState.getString(OPERATOR_VALUE);
+        operatorDisplayTextView.setText(operator);
     }
 
     private String performOperation(Double value1, Double value2, String op){
@@ -127,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
                 return output;
 
             case "/":
+                //Need to add the test for zero
+                if (value1 == 0.0){
+                    return "0.00"; //In such case return from here no need to go ahead with the code
+                }
                 result = value1 / value2;
                 output = result.toString();
                 return output;
@@ -139,5 +180,12 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return null;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //Save the state of application widgets when system is about to destroy the activity
+        outState.putString(OPERATOR_VALUE, operatorDisplayTextView.getText().toString());
+        super.onSaveInstanceState(outState);
     }
 }

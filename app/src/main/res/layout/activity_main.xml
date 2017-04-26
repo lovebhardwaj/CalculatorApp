@@ -230,6 +230,18 @@
             android:layout_gravity="center_vertical"
             android:layout_row="3"
             android:text="-"/>
+
+        <Button
+            android:id="@+id/buttonClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnSpan="2"
+            android:layout_columnWeight="1"
+            android:layout_gravity="center_vertical"
+            android:layout_row="4"
+            android:text="CLR"/>
+
     </GridLayout>
 
 </android.support.constraint.ConstraintLayout>
